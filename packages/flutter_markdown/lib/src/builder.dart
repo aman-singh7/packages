@@ -101,6 +101,7 @@ class MarkdownBuilder implements md.NodeVisitor {
     required this.checkboxBuilder,
     required this.bulletBuilder,
     required this.builders,
+    required this.blockBuilders,
     required this.listItemCrossAxisAlignment,
     this.fitContent = false,
     this.onTapText,
@@ -129,8 +130,11 @@ class MarkdownBuilder implements md.NodeVisitor {
   /// Called when building a custom bullet.
   final MarkdownBulletBuilder? bulletBuilder;
 
-  /// Call when build a custom widget.
+  /// Call when build a custom inline widget.
   final Map<String, MarkdownElementBuilder> builders;
+
+  /// Call when build a custom block widget.
+  final Map<String, MarkdownElementBuilder> blockBuilders;
 
   /// Whether to allow the widget to fit the child content.
   final bool fitContent;
@@ -188,7 +192,7 @@ class MarkdownBuilder implements md.NodeVisitor {
     }
 
     int? start;
-    if (_isBlockTag(tag)) {
+    if (_isBlockTag(tag) || blockBuilders.containsKey(tag)) {
       _addAnonymousBlockIfNeeded();
       if (_isListTag(tag)) {
         _listIndents.add(tag);
@@ -245,10 +249,10 @@ class MarkdownBuilder implements md.NodeVisitor {
         element.children!.add(md.Text(''));
       }
 
-      final TextStyle parentStyle = _inlines.last.style!;
+      final TextStyle? parentStyle = _inlines.last.style;
       _inlines.add(_InlineElement(
         tag,
-        style: parentStyle.merge(styleSheet.styles[tag]),
+        style: parentStyle?.merge(styleSheet.styles[tag]),
       ));
     }
 
@@ -333,7 +337,7 @@ class MarkdownBuilder implements md.NodeVisitor {
   void visitElementAfter(md.Element element) {
     final String tag = element.tag;
 
-    if (_isBlockTag(tag)) {
+    if (_isBlockTag(tag) || blockBuilders.containsKey(tag)) {
       _addAnonymousBlockIfNeeded();
 
       final _BlockElement current = _blocks.removeLast();
@@ -409,6 +413,8 @@ class MarkdownBuilder implements md.NodeVisitor {
         );
       } else if (tag == 'hr') {
         child = Container(decoration: styleSheet.horizontalRuleDecoration);
+      } else if (blockBuilders.containsKey(tag)) {
+        child = blockBuilders[tag]!.visitElementAfter(element, styleSheet.styles[tag])!;
       }
 
       _addBlockChild(child);
@@ -568,7 +574,7 @@ class MarkdownBuilder implements md.NodeVisitor {
     if (_inlines.isEmpty) {
       _inlines.add(_InlineElement(
         tag,
-        style: styleSheet.styles[tag!],
+        style: styleSheet.styles.containsKey(tag) ? styleSheet.styles[tag!] : null,
       ));
     }
   }
@@ -589,7 +595,7 @@ class MarkdownBuilder implements md.NodeVisitor {
 
     WrapAlignment blockAlignment = WrapAlignment.start;
     TextAlign textAlign = TextAlign.start;
-    if (_isBlockTag(_currentBlockTag)) {
+    if (_isBlockTag(_currentBlockTag) || blockBuilders.containsKey(_currentBlockTag)) {
       blockAlignment = _wrapAlignmentForBlockTag(_currentBlockTag);
       textAlign = _textAlignForBlockTag(_currentBlockTag);
     }

@@ -167,6 +167,7 @@ abstract class MarkdownWidget extends StatefulWidget {
     this.checkboxBuilder,
     this.bulletBuilder,
     this.builders = const <String, MarkdownElementBuilder>{},
+    this.blockBuilders = const <String, MarkdownElementBuilder>{},
     this.fitContent = false,
     this.listItemCrossAxisAlignment =
         MarkdownListItemCrossAxisAlignment.baseline,
@@ -224,7 +225,7 @@ abstract class MarkdownWidget extends StatefulWidget {
   /// Called when building a bullet
   final MarkdownBulletBuilder? bulletBuilder;
 
-  /// Render certain tags, usually used with [extensionSet]
+  /// Render certain inline tags, usually used with [extensionSet]
   ///
   /// For example, we will add support for `sub` tag:
   ///
@@ -236,6 +237,19 @@ abstract class MarkdownWidget extends StatefulWidget {
   ///
   /// The `SubscriptBuilder` is a subclass of [MarkdownElementBuilder].
   final Map<String, MarkdownElementBuilder> builders;
+
+  /// Render certain block tags, usually used with custom block syntaxes
+  ///
+  /// For example, we will add support for `iframe` tag:
+  ///
+  /// ```dart
+  /// blockBuilders: {
+  ///   'iframe': IframeBuilder(),
+  /// }
+  /// ```
+  ///
+  /// The `IframeBuilder` is a subclass of [MarkdownElementBuilder].
+  final Map<String, MarkdownElementBuilder> blockBuilders;
 
   /// Whether to allow the widget to fit the child content.
   final bool fitContent;
@@ -313,6 +327,7 @@ class _MarkdownWidgetState extends State<MarkdownWidget>
       checkboxBuilder: widget.checkboxBuilder,
       bulletBuilder: widget.bulletBuilder,
       builders: widget.builders,
+      blockBuilders: widget.blockBuilders,
       fitContent: widget.fitContent,
       listItemCrossAxisAlignment: widget.listItemCrossAxisAlignment,
       onTapText: widget.onTapText,
@@ -386,6 +401,8 @@ class MarkdownBody extends MarkdownWidget {
     MarkdownBulletBuilder? bulletBuilder,
     Map<String, MarkdownElementBuilder> builders =
         const <String, MarkdownElementBuilder>{},
+    Map<String, MarkdownElementBuilder> blockBuilders =
+        const <String, MarkdownElementBuilder>{},
     MarkdownListItemCrossAxisAlignment listItemCrossAxisAlignment =
         MarkdownListItemCrossAxisAlignment.baseline,
     this.shrinkWrap = true,
@@ -406,6 +423,7 @@ class MarkdownBody extends MarkdownWidget {
           imageBuilder: imageBuilder,
           checkboxBuilder: checkboxBuilder,
           builders: builders,
+          blockBuilders: blockBuilders,
           listItemCrossAxisAlignment: listItemCrossAxisAlignment,
           bulletBuilder: bulletBuilder,
           fitContent: fitContent,
