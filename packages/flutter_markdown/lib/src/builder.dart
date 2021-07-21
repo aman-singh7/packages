@@ -496,11 +496,11 @@ class MarkdownBuilder implements md.NodeVisitor {
     final Uri uri = Uri.parse(path);
     Widget child;
     if (imageBuilder != null) {
-      child = imageBuilder!(uri, title, alt);
+      child = imageBuilder!(uri, title, alt) ?? kDefaultImageBuilder(uri, imageDirectory, width, height);
     } else {
       child = kDefaultImageBuilder(uri, imageDirectory, width, height);
     }
-
+    
     if (_linkHandlers.isNotEmpty) {
       final TapGestureRecognizer recognizer =
           _linkHandlers.last as TapGestureRecognizer;
