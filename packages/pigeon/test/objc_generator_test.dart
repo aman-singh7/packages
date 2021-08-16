@@ -9,9 +9,13 @@ import 'package:test/test.dart';
 void main() {
   test('gen one class header', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Foobar',
-          fields: <Field>[Field(name: 'field1', dataType: 'String')]),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(), root, sink);
@@ -22,9 +26,13 @@ void main() {
 
   test('gen one class source', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Foobar',
-          fields: <Field>[Field(name: 'field1', dataType: 'String')]),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(const ObjcOptions(header: 'foo.h'), root, sink);
@@ -75,9 +83,17 @@ void main() {
       classes: <Class>[
         Class(
           name: 'Foobar',
-          fields: <Field>[
-            Field(name: 'field1', dataType: 'String'),
-            Field(name: 'enum1', dataType: 'Enum1'),
+          fields: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'String', isNullable: true, typeArguments: null),
+                name: 'field1',
+                offset: null),
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Enum1', isNullable: true, typeArguments: null),
+                name: 'enum1',
+                offset: null),
           ],
         ),
       ],
@@ -99,18 +115,73 @@ void main() {
     expect(code, contains('result.enum1 = [dict[@"enum1"] integerValue];'));
   });
 
+  test('gen one class header with enum', () {
+    final Root root = Root(
+      apis: <Api>[],
+      classes: <Class>[
+        Class(
+          name: 'Foobar',
+          fields: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'String', isNullable: true, typeArguments: null),
+                name: 'field1',
+                offset: null),
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Enum1', isNullable: true, typeArguments: null),
+                name: 'enum1',
+                offset: null),
+          ],
+        ),
+      ],
+      enums: <Enum>[
+        Enum(
+          name: 'Enum1',
+          members: <String>[
+            'one',
+            'two',
+          ],
+        )
+      ],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateObjcHeader(const ObjcOptions(header: 'foo.h'), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('@property(nonatomic, assign) Enum1 enum1'));
+  });
+
   test('gen one api header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(), root, sink);
@@ -125,15 +196,34 @@ void main() {
   test('gen one api source', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(const ObjcOptions(header: 'foo.h'), root, sink);
@@ -146,15 +236,47 @@ void main() {
 
   test('all the simple datatypes header', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(name: 'Foobar', fields: <Field>[
-        Field(name: 'aBool', dataType: 'bool'),
-        Field(name: 'aInt', dataType: 'int'),
-        Field(name: 'aDouble', dataType: 'double'),
-        Field(name: 'aString', dataType: 'String'),
-        Field(name: 'aUint8List', dataType: 'Uint8List'),
-        Field(name: 'aInt32List', dataType: 'Int32List'),
-        Field(name: 'aInt64List', dataType: 'Int64List'),
-        Field(name: 'aFloat64List', dataType: 'Float64List'),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'bool', isNullable: true, typeArguments: null),
+            name: 'aBool',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'int', isNullable: true, typeArguments: null),
+            name: 'aInt',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'double', isNullable: true, typeArguments: null),
+            name: 'aDouble',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'aString',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Uint8List', isNullable: true, typeArguments: null),
+            name: 'aUint8List',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Int32List', isNullable: true, typeArguments: null),
+            name: 'aInt32List',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Int64List', isNullable: true, typeArguments: null),
+            name: 'aInt64List',
+            offset: null),
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Float64List', isNullable: true, typeArguments: null),
+            name: 'aFloat64List',
+            offset: null),
       ]),
     ], enums: <Enum>[]);
 
@@ -179,8 +301,12 @@ void main() {
 
   test('bool source', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(name: 'Foobar', fields: <Field>[
-        Field(name: 'aBool', dataType: 'bool'),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'bool', isNullable: true, typeArguments: null),
+            name: 'aBool',
+            offset: null),
       ]),
     ], enums: <Enum>[]);
 
@@ -193,12 +319,20 @@ void main() {
 
   test('nested class header', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Nested',
-          fields: <Field>[Field(name: 'nested', dataType: 'Input')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Nested', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Input', isNullable: true, typeArguments: null),
+            name: 'nested',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(header: 'foo.h'), root, sink);
@@ -209,12 +343,20 @@ void main() {
 
   test('nested class source', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Nested',
-          fields: <Field>[Field(name: 'nested', dataType: 'Input')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Nested', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Input', isNullable: true, typeArguments: null),
+            name: 'nested',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(const ObjcOptions(header: 'foo.h'), root, sink);
@@ -225,9 +367,13 @@ void main() {
 
   test('prefix class header', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Foobar',
-          fields: <Field>[Field(name: 'field1', dataType: 'String')]),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(prefix: 'ABC'), root, sink);
@@ -237,9 +383,13 @@ void main() {
 
   test('prefix class source', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Foobar',
-          fields: <Field>[Field(name: 'field1', dataType: 'String')]),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(const ObjcOptions(prefix: 'ABC'), root, sink);
@@ -250,15 +400,34 @@ void main() {
   test('prefix nested class header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'Nested')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Nested', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Nested',
-          fields: <Field>[Field(name: 'nested', dataType: 'Input')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Nested', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Input', isNullable: true, typeArguments: null),
+            name: 'nested',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(prefix: 'ABC'), root, sink);
@@ -271,36 +440,74 @@ void main() {
   test('prefix nested class source', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'Nested')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Nested', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Nested',
-          fields: <Field>[Field(name: 'nested', dataType: 'Input')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Nested', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Input', isNullable: true, typeArguments: null),
+            name: 'nested',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(const ObjcOptions(prefix: 'ABC'), root, sink);
     final String code = sink.toString();
     expect(code, contains('ABCInput fromMap'));
-    expect(code, matches('ABCInput.*=.*ABCInput fromMap'));
+    expect(code, matches('ABCInput.*=.*message'));
     expect(code, contains('void ABCApiSetup('));
   });
 
   test('gen flutter api header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(header: 'foo.h'), root, sink);
@@ -316,15 +523,34 @@ void main() {
   test('gen flutter api source', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(const ObjcOptions(header: 'foo.h'), root, sink);
@@ -336,12 +562,27 @@ void main() {
   test('gen host void header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'void')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -353,12 +594,27 @@ void main() {
   test('gen host void source', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'void')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -372,12 +628,27 @@ void main() {
   test('gen flutter void return header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'void')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -389,12 +660,27 @@ void main() {
   test('gen flutter void return source', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
-        Method(name: 'doSomething', argType: 'Input', returnType: 'void')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -407,12 +693,19 @@ void main() {
   test('gen host void arg header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'void', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -424,12 +717,19 @@ void main() {
   test('gen host void arg source', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
-        Method(name: 'doSomething', argType: 'void', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -441,12 +741,19 @@ void main() {
   test('gen flutter void arg header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
-        Method(name: 'doSomething', argType: 'void', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -461,12 +768,19 @@ void main() {
   test('gen flutter void arg header', () {
     final Root root = Root(apis: <Api>[
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
-        Method(name: 'doSomething', argType: 'void', returnType: 'Output')
+        Method(
+            name: 'doSomething',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false))
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -481,9 +795,13 @@ void main() {
 
   test('gen list', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Foobar',
-          fields: <Field>[Field(name: 'field1', dataType: 'List')]),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'List', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(), root, sink);
@@ -494,9 +812,13 @@ void main() {
 
   test('gen map', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
-      Class(
-          name: 'Foobar',
-          fields: <Field>[Field(name: 'field1', dataType: 'Map')]),
+      Class(name: 'Foobar', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Map', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(const ObjcOptions(), root, sink);
@@ -510,17 +832,33 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'Input',
-            returnType: 'void',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -537,17 +875,33 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'Input',
-            returnType: 'Output',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -564,14 +918,18 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'void',
-            returnType: 'Output',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcHeader(
@@ -588,8 +946,8 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'void',
-            returnType: 'void',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[], enums: <Enum>[]);
@@ -608,17 +966,33 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'Input',
-            returnType: 'Output',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -635,17 +1009,33 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'Input',
-            returnType: 'void',
+            arguments: <NamedType>[
+              NamedType(
+                  type: TypeDeclaration(
+                      baseName: 'Input',
+                      isNullable: false,
+                      typeArguments: null),
+                  name: '',
+                  offset: null)
+            ],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -662,8 +1052,8 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'void',
-            returnType: 'void',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'void', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[], enums: <Enum>[]);
@@ -680,14 +1070,18 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
             name: 'doSomething',
-            argType: 'void',
-            returnType: 'Output',
+            arguments: <NamedType>[],
+            returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
             isAsynchronous: true)
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateObjcSource(
@@ -731,5 +1125,216 @@ void main() {
     );
     final String code = sink.toString();
     expect(code, startsWith('// hello world'));
+  });
+
+  test('field generics', () {
+    final Class klass = Class(
+      name: 'Foobar',
+      fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'List',
+                isNullable: true,
+                typeArguments: <TypeDeclaration>[
+                  TypeDeclaration(baseName: 'int', isNullable: true)
+                ]),
+            name: 'field1',
+            offset: null),
+      ],
+    );
+    final Root root = Root(
+      apis: <Api>[],
+      classes: <Class>[klass],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateObjcHeader(
+        const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('NSArray<NSNumber *> * field1'));
+  });
+
+  test('host generics argument', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(baseName: 'void', isNullable: false),
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'List',
+                        isNullable: false,
+                        typeArguments: <TypeDeclaration>[
+                          TypeDeclaration(baseName: 'int', isNullable: true)
+                        ]),
+                    name: 'arg',
+                    offset: null)
+              ])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcHeader(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('doit:(NSArray<NSNumber *>*)input'));
+    }
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcSource(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('NSArray<NSNumber *> *input = message'));
+    }
+  });
+
+  test('flutter generics argument', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(baseName: 'void', isNullable: false),
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'List',
+                        isNullable: false,
+                        typeArguments: <TypeDeclaration>[
+                          TypeDeclaration(baseName: 'int', isNullable: true)
+                        ]),
+                    name: 'arg',
+                    offset: null)
+              ])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcHeader(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('doit:(NSArray<NSNumber *>*)input'));
+    }
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcSource(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('doit:(NSArray<NSNumber *>*)input'));
+    }
+  });
+
+  test('host nested generic argument', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(baseName: 'void', isNullable: false),
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'List',
+                        isNullable: false,
+                        typeArguments: <TypeDeclaration>[
+                          TypeDeclaration(
+                              baseName: 'List',
+                              isNullable: true,
+                              typeArguments: <TypeDeclaration>[
+                                TypeDeclaration(
+                                    baseName: 'bool', isNullable: true)
+                              ]),
+                        ]),
+                    name: 'arg',
+                    offset: null)
+              ])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcHeader(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('doit:(NSArray<NSArray<NSNumber *> *>*)input'));
+    }
+  });
+
+  test('host generics return', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(
+                  baseName: 'List',
+                  isNullable: false,
+                  typeArguments: <TypeDeclaration>[
+                    TypeDeclaration(baseName: 'int', isNullable: true)
+                  ]),
+              arguments: <NamedType>[])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcHeader(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('-(nullable NSArray<NSNumber *> *)doit:'));
+    }
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcSource(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('NSArray<NSNumber *> *output ='));
+    }
+  });
+
+  test('host generics return', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(
+                  baseName: 'List',
+                  isNullable: false,
+                  typeArguments: <TypeDeclaration>[
+                    TypeDeclaration(baseName: 'int', isNullable: true)
+                  ]),
+              arguments: <NamedType>[])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcHeader(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('doit:(void(^)(NSArray<NSNumber *>*'));
+    }
+    {
+      final StringBuffer sink = StringBuffer();
+      generateObjcSource(
+          const ObjcOptions(header: 'foo.h', prefix: 'ABC'), root, sink);
+      final String code = sink.toString();
+      expect(code, contains('doit:(void(^)(NSArray<NSNumber *>*'));
+    }
   });
 }

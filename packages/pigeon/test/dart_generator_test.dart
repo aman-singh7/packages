@@ -11,11 +11,12 @@ void main() {
   test('gen one class', () {
     final Class klass = Class(
       name: 'Foobar',
-      fields: <Field>[
-        Field(
-          name: 'field1',
-          dataType: 'dataType1',
-        ),
+      fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'dataType1', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null),
       ],
     );
     final Root root = Root(
@@ -56,35 +57,61 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'Output',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: 'input',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
     final String code = sink.toString();
     expect(code, contains('class Api'));
-    expect(code, matches('Output.*doSomething.*Input'));
+    expect(code, contains('Future<Output> doSomething(Input input)'));
   });
 
   test('nested class', () {
     final Root root = Root(apis: <Api>[], classes: <Class>[
       Class(
         name: 'Input',
-        fields: <Field>[Field(name: 'input', dataType: 'String')],
+        fields: <NamedType>[
+          NamedType(
+              type: TypeDeclaration(
+                  baseName: 'String', isNullable: true, typeArguments: null),
+              name: 'input',
+              offset: null)
+        ],
       ),
       Class(
         name: 'Nested',
-        fields: <Field>[Field(name: 'nested', dataType: 'Input')],
+        fields: <NamedType>[
+          NamedType(
+              type: TypeDeclaration(
+                  baseName: 'Input', isNullable: true, typeArguments: null),
+              name: 'nested',
+              offset: null)
+        ],
       )
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
@@ -109,24 +136,39 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'Output',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: 'input',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
     final String code = sink.toString();
     expect(code, contains('abstract class Api'));
     expect(code, contains('static void setup(Api'));
+    expect(code, contains('Output doSomething(Input input)'));
   });
 
   test('host void', () {
@@ -134,15 +176,25 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'void',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'void', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -156,15 +208,25 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'void',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'void', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -174,7 +236,6 @@ void main() {
     // we mention "doSomething" in the assertion message.
     expect(code, isNot(matches('[^!]=.*doSomething')));
     expect(code, contains('doSomething('));
-    expect(code, isNot(contains('.encode()')));
   });
 
   test('flutter void argument', () {
@@ -182,15 +243,19 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'void',
-          returnType: 'Output',
+          arguments: <NamedType>[],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -204,15 +269,27 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'EnumClass',
-          returnType: 'EnumClass',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'EnumClass',
+                    isNullable: false,
+                    typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'EnumClass', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'EnumClass',
-          fields: <Field>[Field(name: 'enum1', dataType: 'Enum')]),
+      Class(name: 'EnumClass', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Enum', isNullable: true, typeArguments: null),
+            name: 'enum1',
+            offset: null)
+      ]),
     ], enums: <Enum>[
       Enum(
         name: 'Enum',
@@ -236,15 +313,27 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'EnumClass',
-          returnType: 'EnumClass',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'EnumClass',
+                    isNullable: false,
+                    typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'EnumClass', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'EnumClass',
-          fields: <Field>[Field(name: 'enum1', dataType: 'Enum')]),
+      Class(name: 'EnumClass', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Enum', isNullable: true, typeArguments: null),
+            name: 'enum1',
+            offset: null)
+      ]),
     ], enums: <Enum>[
       Enum(
         name: 'Enum',
@@ -270,15 +359,19 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'void',
-          returnType: 'Output',
+          arguments: <NamedType>[],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: false,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -295,24 +388,49 @@ void main() {
           methods: <Method>[
             Method(
               name: 'doSomething',
-              argType: 'Input',
-              returnType: 'Output',
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'Input',
+                        isNullable: false,
+                        typeArguments: null),
+                    name: '',
+                    offset: null)
+              ],
+              returnType:
+                  TypeDeclaration(baseName: 'Output', isNullable: false),
               isAsynchronous: false,
             ),
             Method(
               name: 'voidReturner',
-              argType: 'Input',
-              returnType: 'void',
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'Input',
+                        isNullable: false,
+                        typeArguments: null),
+                    name: '',
+                    offset: null)
+              ],
+              returnType: TypeDeclaration(baseName: 'void', isNullable: false),
               isAsynchronous: false,
             )
           ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer mainCodeSink = StringBuffer();
     final StringBuffer testCodeSink = StringBuffer();
@@ -322,7 +440,7 @@ void main() {
     expect(mainCode, contains('class Api {'));
     expect(mainCode, isNot(contains('abstract class ApiMock')));
     expect(mainCode, isNot(contains('.ApiMock.doSomething')));
-    expect(mainCode, isNot(contains('\'${Keys.result}\': output.encode()')));
+    expect(mainCode, isNot(contains('\'${Keys.result}\': output')));
     expect(mainCode, isNot(contains('return <Object, Object>{};')));
     generateTestDart(
         const DartOptions(isNullSafe: false), root, testCodeSink, "fo'o.dart");
@@ -331,18 +449,19 @@ void main() {
     expect(testCode, isNot(contains('class Api {')));
     expect(testCode, contains('abstract class ApiMock'));
     expect(testCode, isNot(contains('.ApiMock.doSomething')));
-    expect(testCode, contains('\'${Keys.result}\': output.encode()'));
+    expect(testCode, contains('\'${Keys.result}\': output'));
     expect(testCode, contains('return <Object, Object>{};'));
   });
 
   test('opt out of nndb', () {
     final Class klass = Class(
       name: 'Foobar',
-      fields: <Field>[
-        Field(
-          name: 'field1',
-          dataType: 'dataType1',
-        ),
+      fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'dataType1', isNullable: true, typeArguments: null),
+            name: 'field1',
+            offset: null),
       ],
     );
     final Root root = Root(
@@ -361,18 +480,32 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'Output',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: true,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -388,18 +521,32 @@ void main() {
       Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'void',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'void', isNullable: false),
           isAsynchronous: true,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -414,18 +561,32 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'Input',
-          returnType: 'Output',
+          arguments: <NamedType>[
+            NamedType(
+                type: TypeDeclaration(
+                    baseName: 'Input', isNullable: false, typeArguments: null),
+                name: '',
+                offset: null)
+          ],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: true,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Input',
-          fields: <Field>[Field(name: 'input', dataType: 'String')]),
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')])
+      Class(name: 'Input', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'input',
+            offset: null)
+      ]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ])
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -439,15 +600,19 @@ void main() {
       Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
         Method(
           name: 'doSomething',
-          argType: 'void',
-          returnType: 'Output',
+          arguments: <NamedType>[],
+          returnType: TypeDeclaration(baseName: 'Output', isNullable: false),
           isAsynchronous: true,
         )
       ])
     ], classes: <Class>[
-      Class(
-          name: 'Output',
-          fields: <Field>[Field(name: 'output', dataType: 'String')]),
+      Class(name: 'Output', fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'String', isNullable: true, typeArguments: null),
+            name: 'output',
+            offset: null)
+      ]),
     ], enums: <Enum>[]);
     final StringBuffer sink = StringBuffer();
     generateDart(const DartOptions(isNullSafe: false), root, sink);
@@ -470,5 +635,183 @@ void main() {
     );
     final String code = sink.toString();
     expect(code, startsWith('// hello world'));
+  });
+
+  test('generics', () {
+    final Class klass = Class(
+      name: 'Foobar',
+      fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'List',
+                isNullable: true,
+                typeArguments: <TypeDeclaration>[
+                  TypeDeclaration(baseName: 'int', isNullable: true)
+                ]),
+            name: 'field1',
+            offset: null),
+      ],
+    );
+    final Root root = Root(
+      apis: <Api>[],
+      classes: <Class>[klass],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateDart(const DartOptions(isNullSafe: true), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('class Foobar'));
+    expect(code, contains('  List<int?>? field1;'));
+  });
+
+  test('map generics', () {
+    final Class klass = Class(
+      name: 'Foobar',
+      fields: <NamedType>[
+        NamedType(
+            type: TypeDeclaration(
+                baseName: 'Map',
+                isNullable: true,
+                typeArguments: <TypeDeclaration>[
+                  TypeDeclaration(baseName: 'String', isNullable: true),
+                  TypeDeclaration(baseName: 'int', isNullable: true),
+                ]),
+            name: 'field1',
+            offset: null),
+      ],
+    );
+    final Root root = Root(
+      apis: <Api>[],
+      classes: <Class>[klass],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateDart(const DartOptions(isNullSafe: true), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('class Foobar'));
+    expect(code, contains('  Map<String?, int?>? field1;'));
+  });
+
+  test('host generics argument', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(baseName: 'void', isNullable: false),
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'List',
+                        isNullable: false,
+                        typeArguments: <TypeDeclaration>[
+                          TypeDeclaration(baseName: 'int', isNullable: true)
+                        ]),
+                    name: 'arg',
+                    offset: null)
+              ])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateDart(const DartOptions(isNullSafe: true), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('doit(List<int?> arg'));
+  });
+
+  test('flutter generics argument', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(baseName: 'void', isNullable: false),
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'List',
+                        isNullable: false,
+                        typeArguments: <TypeDeclaration>[
+                          TypeDeclaration(baseName: 'int', isNullable: true)
+                        ]),
+                    name: 'arg',
+                    offset: null)
+              ])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateDart(const DartOptions(isNullSafe: true), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('doit(List<int?> arg'));
+  });
+
+  test('host generics return', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.host, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(
+                  baseName: 'List',
+                  isNullable: false,
+                  typeArguments: <TypeDeclaration>[
+                    TypeDeclaration(baseName: 'int', isNullable: true)
+                  ]),
+              arguments: <NamedType>[])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateDart(const DartOptions(isNullSafe: true), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('Future<List<int?>> doit('));
+    expect(
+        code,
+        contains(
+            'return (replyMap[\'result\'] as List<Object?>?)!.cast<int?>();'));
+  });
+
+  test('host generics return', () {
+    final Root root = Root(
+      apis: <Api>[
+        Api(name: 'Api', location: ApiLocation.flutter, methods: <Method>[
+          Method(
+              name: 'doit',
+              returnType: TypeDeclaration(
+                  baseName: 'List',
+                  isNullable: false,
+                  typeArguments: <TypeDeclaration>[
+                    TypeDeclaration(baseName: 'int', isNullable: true)
+                  ]),
+              arguments: <NamedType>[
+                NamedType(
+                    type: TypeDeclaration(
+                        baseName: 'List',
+                        isNullable: false,
+                        typeArguments: <TypeDeclaration>[
+                          TypeDeclaration(baseName: 'int', isNullable: true)
+                        ]),
+                    name: 'arg',
+                    offset: null)
+              ])
+        ])
+      ],
+      classes: <Class>[],
+      enums: <Enum>[],
+    );
+    final StringBuffer sink = StringBuffer();
+    generateDart(const DartOptions(isNullSafe: true), root, sink);
+    final String code = sink.toString();
+    expect(code, contains('List<int?> doit('));
+    expect(
+        code, contains('final List<int?> input = (message as List<int?>?)!'));
+    expect(code, contains('final List<int?> output = api.doit(input)'));
   });
 }
